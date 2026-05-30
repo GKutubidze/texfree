@@ -10,7 +10,7 @@ const { v4: uuidv4 } = require('uuid');
 const os = require('os');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({
