@@ -20,7 +20,6 @@ const editorTheme = EditorView.theme({
     padding: '12px 0',
     lineHeight: '1.65',
     caretColor: '#4F8EF7',
-    background: '#16161F',
     color: '#ABB2BF',
   },
   '.cm-gutters': {

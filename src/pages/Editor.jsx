@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useLayoutEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Split from 'react-split'
 import EditorPane from '../components/EditorPane'
@@ -8,9 +8,35 @@ import { compileLatex } from '../lib/api'
 import { EXAMPLES, DEFAULT_EXAMPLE } from '../lib/examples'
 import './Editor.css'
 
-const FILENAME = 'paper.tex'
-
 export default function Editor() {
+  // filename state
+  const [filename, setFilename] = useState('paper.tex')
+  const [renamingFile, setRenamingFile] = useState(false)
+  const preEditFilename = useRef('')
+  const filenameInputRef = useRef(null)
+
+  const startRename = () => {
+    preEditFilename.current = filename
+    setRenamingFile(true)
+  }
+
+  const commitRename = useCallback((val) => {
+    const trimmed = val.trim()
+    setFilename(trimmed || preEditFilename.current)
+    setRenamingFile(false)
+  }, [])
+
+  const cancelRename = useCallback(() => {
+    setFilename(preEditFilename.current)
+    setRenamingFile(false)
+  }, [])
+
+  useLayoutEffect(() => {
+    if (renamingFile && filenameInputRef.current) {
+      filenameInputRef.current.select()
+    }
+  }, [renamingFile])
+
   // editor state
   const [code, setCode] = useState(() => {
     try { return localStorage.getItem('texfree-document') || DEFAULT_EXAMPLE }
@@ -131,7 +157,8 @@ export default function Editor() {
       const url   = URL.createObjectURL(blob)
       const a     = document.createElement('a')
       a.href = url
-      a.download = FILENAME.replace('.tex', '.pdf')
+      const baseName = filename.endsWith('.tex') ? filename.slice(0, -4) : filename
+      a.download = baseName + '.pdf'
       a.click()
       URL.revokeObjectURL(url)
       showToast('PDF downloaded')
@@ -143,7 +170,7 @@ export default function Editor() {
       showToast("Opening print dialog — choose 'Save as PDF'")
       setTimeout(() => window.print(), 400)
     }
-  }, [pdfBase64, showToast])
+  }, [pdfBase64, filename, showToast])
 
   // ── examples ──────────────────────────────────────────────────
   const loadExample = useCallback((key) => {
@@ -172,10 +199,28 @@ export default function Editor() {
           TeXFree
         </Link>
         <span className="editor-topbar-sep" />
-        <div className="editor-topbar-file-tab">
-          <span className="editor-topbar-file-dot" />
-          {FILENAME}
-        </div>
+        {renamingFile ? (
+          <input
+            ref={filenameInputRef}
+            className="editor-topbar-file-input"
+            value={filename}
+            onChange={e => setFilename(e.target.value)}
+            onBlur={e => commitRename(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') commitRename(e.target.value)
+              if (e.key === 'Escape') cancelRename()
+            }}
+          />
+        ) : (
+          <div
+            className="editor-topbar-file-tab"
+            onClick={startRename}
+            title="Click to rename"
+          >
+            <span className="editor-topbar-file-dot" />
+            {filename}
+          </div>
+        )}
 
         {/* right: save indicator, engine, compile, download, examples, help */}
         <div className="editor-topbar-actions">

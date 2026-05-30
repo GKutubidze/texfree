@@ -71,6 +71,24 @@
   color: var(--color-ink);
   font-family: var(--font-mono);
   flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color var(--duration-fast);
+}
+.editor-topbar-file-tab:hover { border-color: var(--color-accent); }
+
+.editor-topbar-file-input {
+  padding: 4px 11px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  outline: none;
+  min-width: 90px;
+  max-width: 220px;
+  box-shadow: 0 0 0 2px rgba(79, 142, 247, 0.15);
 }
 .editor-topbar-file-dot {
   width: 6px;
