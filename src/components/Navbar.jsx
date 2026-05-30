@@ -16,7 +16,7 @@ export default function Navbar({ transparent = false }) {
         <div className="navbar__links">
           <a href="#how-it-works" className="navbar__link">How it works</a>
           <a
-            href="https://github.com"
+            href="https://github.com/GKutubidze/texfree"
             target="_blank"
             rel="noopener noreferrer"
             className="navbar__link"
@@ -41,7 +41,7 @@ export default function Navbar({ transparent = false }) {
         <div className="navbar__mobile-menu">
           <a href="#how-it-works" className="navbar__mobile-link" onClick={() => setMenuOpen(false)}>How it works</a>
           <a
-            href="https://github.com"
+            href="https://github.com/GKutubidze/texfree"
             target="_blank"
             rel="noopener noreferrer"
             className="navbar__mobile-link"
