@@ -40,6 +40,19 @@ button {
   background: none;
 }
 
+/* CodeMirror selection — global override so theme specificity never loses */
+.cm-editor .cm-selectionBackground {
+  background-color: rgba(79, 142, 247, 0.4) !important;
+}
+
+.cm-editor.cm-focused .cm-selectionBackground {
+  background-color: rgba(79, 142, 247, 0.4) !important;
+}
+
+.cm-editor ::selection {
+  background-color: rgba(79, 142, 247, 0.4) !important;
+}
+
 /* Print styles for PDF download */
 @media print {
   body > * { display: none !important; }
