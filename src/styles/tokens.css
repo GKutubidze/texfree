@@ -1,0 +1,66 @@
+:root {
+  /* UI palette */
+  --color-bg:            #FBFBFC;
+  --color-ink:           #15161B;
+  --color-ink-muted:     #6B7280;
+  --color-ink-faint:     #9CA3AF;
+  --color-accent:        #4F8EF7;
+  --color-accent-hover:  #3B7DE8;
+  --color-accent-subtle: rgba(79, 142, 247, 0.08);
+  --color-surface:       #FFFFFF;
+  --color-border:        #E5E7EB;
+  --color-border-strong: #D1D5DB;
+  --color-success:       #22C55E;
+  --color-warning:       #F59E0B;
+  --color-error:         #EF4444;
+
+  /* Editor dark theme */
+  --editor-bg:         #16161F;
+  --editor-gutter:     #1E1E2A;
+  --editor-border:     #2A2A3A;
+  --editor-text:       #ABB2BF;
+  --editor-comment:    #5C6370;
+  --editor-command:    #61AFEF;
+  --editor-brace:      #ABB2BF;
+  --editor-math:       #E5C07B;
+  --editor-string:     #98C379;
+  --editor-number:     #D19A66;
+  --editor-cursor:     #4F8EF7;
+  --editor-selection:  rgba(79, 142, 247, 0.25);
+
+  /* Preview pane */
+  --preview-bg:    #F0F0EC;
+  --preview-paper: #FFFFFF;
+  --preview-ink:   #1A1A1A;
+  --preview-font:  'Computer Modern', 'Latin Modern', Georgia, serif;
+
+  /* Typography */
+  --font-ui:   'DM Sans', 'Outfit', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Spacing */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px;  --space-5: 20px;  --space-6: 24px;
+  --space-8: 32px;  --space-10: 40px; --space-12: 48px;
+  --space-16: 64px; --space-20: 80px;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Shadows */
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:    0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:    0 12px 32px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-paper: 0 4px 24px rgba(0,0,0,0.12);
+
+  /* Layout */
+  --topbar-height:    52px;
+  --statusbar-height: 26px;
+
+  /* Motion */
+  --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast:  120ms;
+  --duration-normal: 220ms;
+}

@@ -1,0 +1,45 @@
+.editor-pane-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #16161F;
+}
+
+.editor-pane {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  background: #16161F;
+}
+
+.editor-pane .cm-editor {
+  height: 100%;
+  outline: none;
+}
+
+.editor-pane .cm-scroller {
+  overflow: auto;
+  height: 100%;
+}
+
+.editor-statusbar {
+  height: 22px;
+  background: #1C1C28;
+  border-top: 1px solid #272736;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  flex-shrink: 0;
+}
+
+.editor-statusbar-left,
+.editor-statusbar-right {
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: #484860;
+  letter-spacing: 0.07em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
