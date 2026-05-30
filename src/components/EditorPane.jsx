@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react'
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection } from '@codemirror/view'
 import { EditorState, Compartment } from '@codemirror/state'
 import { defaultKeymap, historyKeymap, history, indentWithTab } from '@codemirror/commands'
-import { bracketMatching, indentOnInput } from '@codemirror/language'
+import { bracketMatching, indentOnInput, syntaxHighlighting, HighlightStyle } from '@codemirror/language'
+import { tags as t } from '@lezer/highlight'
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
 import { latex } from 'codemirror-lang-latex'
 import './EditorPane.css'
@@ -33,9 +34,9 @@ const editorTheme = EditorView.theme({
     padding: '0 12px 0 8px',
     minWidth: '40px',
   },
-  '.cm-selectionBackground': { backgroundColor: '#2D3A5A !important' },
-  '&.cm-focused .cm-selectionBackground': { backgroundColor: '#2D3A5A !important' },
-  '.cm-selectionMatch': { backgroundColor: '#1a2a4a' },
+  '&.cm-focused .cm-selectionBackground': { backgroundColor: 'rgba(79, 142, 247, 0.4) !important' },
+  '.cm-selectionBackground': { backgroundColor: 'rgba(79, 142, 247, 0.4) !important' },
+  '.cm-selectionMatch': { backgroundColor: 'rgba(79, 142, 247, 0.2)' },
   '.cm-activeLine': {
     background: 'rgba(255,255,255,0.03)',
   },
@@ -56,6 +57,39 @@ const editorTheme = EditorView.theme({
     color: '#ABB2BF',
   },
 }, { dark: true })
+
+const latexHighlight = HighlightStyle.define([
+  // LaTeX commands: \section, \begin, \end, \usepackage, …
+  { tag: t.keyword,           color: '#61AFEF' },
+  { tag: t.definitionKeyword, color: '#61AFEF' },
+  // Section / heading commands
+  { tag: t.heading,           color: '#61AFEF', fontWeight: 'bold' },
+  // Environment names ({document}, {equation}, …)
+  { tag: t.className,         color: '#C678DD' },
+  // Math content: variables, special chars, dollar signs
+  { tag: t.variableName,      color: '#E5C07B' },
+  { tag: t.processingInstruction, color: '#E5C07B' },
+  // Operators (math specials, &, ~, ctrl symbols)
+  { tag: t.operator,          color: '#56B6C2' },
+  // Comments (%...)
+  { tag: t.comment,           color: '#5C6370', fontStyle: 'italic' },
+  // Braces, brackets
+  { tag: t.bracket,           color: '#ABB2BF' },
+  // Literal args / strings
+  { tag: t.string,            color: '#98C379' },
+  // Verbatim content
+  { tag: t.meta,              color: '#98C379' },
+  // Numbers
+  { tag: t.number,            color: '#D19A66' },
+  // Labels / refs
+  { tag: t.labelName,         color: '#E06C75' },
+  // Bold/italic/monospace control sequences
+  { tag: t.strong,            color: '#61AFEF', fontWeight: 'bold' },
+  { tag: t.emphasis,          color: '#61AFEF', fontStyle: 'italic' },
+  { tag: t.monospace,         color: '#98C379' },
+  // Plain text
+  { tag: t.content,           color: '#ABB2BF' },
+])
 
 export default function EditorPane({ value, onChange, onCompile }) {
   const containerRef = useRef(null)
@@ -80,6 +114,7 @@ export default function EditorPane({ value, onChange, onCompile }) {
         indentOnInput(),
         highlightSelectionMatches(),
         latex(),
+        syntaxHighlighting(latexHighlight),
         editorTheme,
         keymap.of([
           {
