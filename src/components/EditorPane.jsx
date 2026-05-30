@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection } from '@codemirror/view'
 import { EditorState, Compartment } from '@codemirror/state'
 import { defaultKeymap, historyKeymap, history, indentWithTab } from '@codemirror/commands'
@@ -90,11 +90,26 @@ const latexHighlight = HighlightStyle.define([
   { tag: t.content,           color: '#ABB2BF' },
 ])
 
-export default function EditorPane({ value, onChange, onCompile }) {
+const EditorPane = forwardRef(function EditorPane({ value, onChange, onCompile }, ref) {
   const containerRef = useRef(null)
   const viewRef = useRef(null)
   const onCompileRef = useRef(onCompile)
   const onChangeRef = useRef(onChange)
+
+  useImperativeHandle(ref, () => ({
+    jumpToLine(lineNumber) {
+      const view = viewRef.current
+      if (!view) return
+      const total = view.state.doc.lines
+      const target = Math.max(1, Math.min(lineNumber, total))
+      const line = view.state.doc.line(target)
+      view.dispatch({
+        selection: { anchor: line.from },
+        effects: EditorView.scrollIntoView(line.from, { y: 'center' }),
+      })
+      view.focus()
+    },
+  }), [])
 
   useEffect(() => { onCompileRef.current = onCompile }, [onCompile])
   useEffect(() => { onChangeRef.current = onChange }, [onChange])
@@ -162,4 +177,6 @@ export default function EditorPane({ value, onChange, onCompile }) {
       </div>
     </div>
   )
-}
+})
+
+export default EditorPane

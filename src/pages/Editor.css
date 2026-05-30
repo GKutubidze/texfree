@@ -306,6 +306,11 @@
   color: #6B7280;
   flex-shrink: 0;
 }
+.error-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .error-panel-header button {
   color: #6B7280;
   font-size: 16px;
@@ -315,18 +320,84 @@
   border: none;
 }
 .error-panel-header button:hover { color: #fff; }
+.error-panel-copy-btn {
+  font-size: 11px;
+  padding: 2px 9px;
+  border: 1px solid #3D4048;
+  border-radius: 4px;
+  color: #9CA3AF;
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  transition: border-color var(--duration-fast), color var(--duration-fast);
+}
+.error-panel-copy-btn:hover { border-color: #9CA3AF; color: #fff; }
+
 .error-item {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   gap: 10px;
   padding: 7px 16px;
   font-family: var(--font-mono);
   font-size: 12px;
   border-bottom: 1px solid rgba(255,255,255,0.04);
+  flex-wrap: wrap;
 }
 .error-item.is-error   { color: #FC8181; }
 .error-item.is-warning { color: #F6E05E; }
-.error-item__line { margin-left: auto; opacity: 0.45; flex-shrink: 0; }
+.error-item__icon { flex-shrink: 0; }
+.error-item__message { flex: 1; min-width: 0; }
+.error-item__context {
+  font-size: 11px;
+  color: #9CA3AF;
+  background: rgba(255,255,255,0.06);
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.error-item__line {
+  margin-left: auto;
+  opacity: 0.45;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.error-item__line.is-link {
+  cursor: pointer;
+  opacity: 0.7;
+  text-decoration: underline;
+  text-decoration-color: rgba(255,255,255,0.25);
+  transition: opacity var(--duration-fast), color var(--duration-fast);
+}
+.error-item__line.is-link:hover { opacity: 1; color: #63B3ED; }
+
+.error-log-excerpt {
+  border-top: 1px solid #2a2a3a;
+}
+.error-log-excerpt-header {
+  font-size: 10px;
+  padding: 5px 16px;
+  color: #4B5563;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.error-log-excerpt-body {
+  margin: 0;
+  padding: 6px 16px 12px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: #6B7280;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 180px;
+  overflow-y: auto;
+  line-height: 1.55;
+}
 
 /* ── toast ───────────────────────────────────────────────────── */
 .editor-toast {

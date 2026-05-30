@@ -55,8 +55,9 @@ export default function Editor() {
   const [engine, setEngine]         = useState('pdflatex')
 
   // errors / warnings
-  const [errors, setErrors]     = useState([])
-  const [warnings, setWarnings] = useState([])
+  const [errors, setErrors]         = useState([])
+  const [warnings, setWarnings]     = useState([])
+  const [logExcerpt, setLogExcerpt] = useState(null)
   const [showErrors, setShowErrors] = useState(false)
 
   // UI
@@ -66,6 +67,7 @@ export default function Editor() {
   const [toast, setToast]               = useState(null)
   const printRef    = useRef(null)
   const examplesRef = useRef(null)
+  const editorRef   = useRef(null)
 
   // ── auto-save ────────────────────────────────────────────────
   useEffect(() => {
@@ -99,6 +101,7 @@ export default function Editor() {
     setIsCompiling(true)
     setErrors([])
     setWarnings([])
+    setLogExcerpt(null)
 
     const t0 = Date.now()
     try {
@@ -128,6 +131,8 @@ export default function Editor() {
       } else {
         // Real compile error (bad LaTeX)
         setErrors(err.details || [{ message: err.message }])
+        setWarnings(err.warnings || [])
+        setLogExcerpt(err.logExcerpt || null)
         setShowErrors(true)
         showToast('Compilation failed — see error panel', 4500)
       }
@@ -296,7 +301,7 @@ export default function Editor() {
           snapOffset={0}
         >
           <div className={`editor-panel ${activeTab === 'preview' ? 'editor-panel--hidden' : ''}`}>
-            <EditorPane value={code} onChange={setCode} onCompile={compile} />
+            <EditorPane ref={editorRef} value={code} onChange={setCode} onCompile={compile} />
           </div>
           <div className={`editor-panel ${activeTab === 'code' ? 'editor-panel--hidden' : ''}`}>
             <PreviewPane
@@ -318,25 +323,59 @@ export default function Editor() {
         <div className="error-panel">
           <div className="error-panel-header">
             <span>
-              {errors.length > 0
-                ? `${errors.length} error${errors.length > 1 ? 's' : ''}`
-                : `${warnings.length} warning${warnings.length > 1 ? 's' : ''}`}
+              {[
+                errors.length > 0 && `${errors.length} error${errors.length > 1 ? 's' : ''}`,
+                warnings.length > 0 && `${warnings.length} warning${warnings.length > 1 ? 's' : ''}`,
+              ].filter(Boolean).join(', ')}
             </span>
-            <button onClick={() => setShowErrors(false)}>✕</button>
+            <div className="error-panel-header-actions">
+              {(errors.length > 0 || logExcerpt) && (
+                <button
+                  className="error-panel-copy-btn"
+                  onClick={() => {
+                    const lines = [
+                      ...errors.map(e => `Error: ${e.message}${e.line ? ` (line ${e.line})` : ''}${e.context ? ` — ${e.context}` : ''}`),
+                      ...warnings.map(w => `Warning: ${w}`),
+                      ...(logExcerpt ? ['\n--- Log ---', logExcerpt] : []),
+                    ]
+                    navigator.clipboard.writeText(lines.join('\n')).catch(() => {})
+                    showToast('Error copied to clipboard')
+                  }}
+                >
+                  Copy Error
+                </button>
+              )}
+              <button onClick={() => setShowErrors(false)}>✕</button>
+            </div>
           </div>
           {errors.map((e, i) => (
             <div key={i} className="error-item is-error">
-              <span>✕</span>
-              <span>{e.message}</span>
-              {e.line && <span className="error-item__line">line {e.line}</span>}
+              <span className="error-item__icon">✕</span>
+              <span className="error-item__message">{e.message}</span>
+              {e.context && <code className="error-item__context">{e.context}</code>}
+              {e.line != null && (
+                <span
+                  className="error-item__line is-link"
+                  onClick={() => editorRef.current?.jumpToLine(e.line)}
+                  title="Jump to this line in the editor"
+                >
+                  line {e.line}
+                </span>
+              )}
             </div>
           ))}
           {warnings.map((w, i) => (
             <div key={i} className="error-item is-warning">
-              <span>⚠</span>
+              <span className="error-item__icon">⚠</span>
               <span>{w}</span>
             </div>
           ))}
+          {logExcerpt && (
+            <div className="error-log-excerpt">
+              <div className="error-log-excerpt-header">Log output (last 50 lines)</div>
+              <pre className="error-log-excerpt-body">{logExcerpt}</pre>
+            </div>
+          )}
         </div>
       )}
 

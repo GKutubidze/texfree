@@ -12,7 +12,8 @@ export async function compileLatex({ latex, engine = 'pdflatex' }) {
   if (!res.ok) {
     const err = new Error(data.error || `Server error ${res.status}`);
     err.details = data.details;
-    err.log = data.log;
+    err.logExcerpt = data.logExcerpt || data.log || null;
+    err.warnings = data.warnings || [];
     err.engines = data.engines;
     throw err;
   }

@@ -99,18 +99,20 @@ app.post('/compile', async (req, res) => {
     });
 
     const t0 = Date.now();
-    await runOnce();          // first pass
-    await runOnce();          // second pass (cross-refs, TOC)
-    const compileTime = ((Date.now() - t0) / 1000).toFixed(2);
+    await runOnce();  // first pass
 
     if (!fs.existsSync(pdfFile)) {
       const log = fs.existsSync(logFile) ? fs.readFileSync(logFile, 'utf8') : '';
       return res.status(422).json({
         error: 'Compilation failed',
         details: extractErrors(log),
-        log: log.slice(-4000),
+        warnings: extractWarnings(log),
+        logExcerpt: getLogExcerpt(log),
       });
     }
+
+    await runOnce();  // second pass (cross-refs, TOC)
+    const compileTime = ((Date.now() - t0) / 1000).toFixed(2);
 
     const pdfBuffer = fs.readFileSync(pdfFile);
     const log = fs.existsSync(logFile) ? fs.readFileSync(logFile, 'utf8') : '';
@@ -134,28 +136,41 @@ app.post('/compile', async (req, res) => {
 function extractErrors(log) {
   const errors = [];
   const lines = log.split('\n');
+
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith('!')) {
-      errors.push({
-        type: 'error',
-        message: lines[i].slice(1).trim(),
-        line: extractLineNumber(lines[i + 1] || ''),
-      });
+    if (!lines[i].startsWith('!')) continue;
+    const message = lines[i].slice(1).trim();
+    if (!message) continue;
+
+    // TeX places the line-number indicator (l.N ...) up to ~15 lines after the !
+    let lineNum = null;
+    let context = '';
+    for (let j = i + 1; j < Math.min(i + 15, lines.length); j++) {
+      const m = lines[j].match(/^l\.(\d+)\s*(.*)/);
+      if (m) {
+        lineNum = parseInt(m[1]);
+        context = m[2].trim();
+        break;
+      }
     }
+
+    errors.push({ type: 'error', message, line: lineNum, context });
   }
+
   return errors.slice(0, 10);
 }
 
 function extractWarnings(log) {
   return log.split('\n')
-    .filter(l => l.includes('Warning:') && !l.includes('Font Warning'))
+    .filter(l => l.includes('Warning:') && !l.includes('Font Warning') && !l.includes('Font shape'))
     .map(l => l.trim())
-    .slice(0, 5);
+    .filter(Boolean)
+    .slice(0, 8);
 }
 
-function extractLineNumber(line) {
-  const m = line.match(/l\.(\d+)/);
-  return m ? parseInt(m[1]) : null;
+function getLogExcerpt(log, maxLines = 50) {
+  const lines = log.split('\n').filter(l => l.trim());
+  return lines.slice(-maxLines).join('\n');
 }
 
 function countPages(log) {
